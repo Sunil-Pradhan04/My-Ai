@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Event Rules Q&A</title>
+<link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  body {
+    font-family: 'Roboto', sans-serif;
+    background: #f0f2f5;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    margin: 0;
+  }
+  .chat-container {
+    width: 420px;
+    max-width: 95%;
+    background: #fff;
+    border-radius: 15px;
+    box-shadow: 0 8px 30px rgba(0,0,0,0.15);
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+  }
+  .chat-header {
+    background: linear-gradient(90deg, #4a90e2, #357ABD);
+    color: #fff;
+    padding: 15px;
+    font-size: 20px;
+    text-align: center;
+    font-weight: 500;
+  }
+  #chat {
+    flex: 1;
+    padding: 15px;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    background: #f9f9f9;
+  }
+  .message {
+    padding: 12px 18px;
+    border-radius: 20px;
+    max-width: 80%;
+    word-wrap: break-word;
+    position: relative;
+    font-size: 15px;
+    line-height: 1.4;
+    animation: fadeIn 0.3s ease;
+  }
+  @keyframes fadeIn { from {opacity:0;} to {opacity:1;} }
+
+  .user { 
+    background: #e1f0ff;
+    align-self: flex-end;
+    color: #00529b;
+  }
+  .ai { 
+    background: #f1f1f1;
+    align-self: flex-start;
+    color: #333;
+  }
+
+  .chat-input {
+    display: flex;
+    border-top: 1px solid #ddd;
+    padding: 10px;
+    gap: 5px;
+  }
+  .chat-input input {
+    flex: 1;
+    border: none;
+    padding: 12px 15px;
+    font-size: 16px;
+    border-radius: 25px;
+    outline: none;
+    background: #f0f0f0;
+  }
+  .chat-input button {
+    background: #4a90e2;
+    color: #fff;
+    border: none;
+    padding: 0 20px;
+    border-radius: 25px;
+    cursor: pointer;
+    font-size: 16px;
+    transition: 0.2s;
+  }
+  .chat-input button:hover {
+    background: #357ABD;
+  }
+
+  .loader {
+    width: 20px;
+    height: 20px;
+    border: 3px solid #ccc;
+    border-top: 3px solid #4a90e2;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+    display: inline-block;
+    vertical-align: middle;
+  }
+  @keyframes spin {
+    0% { transform: rotate(0deg);}
+    100% { transform: rotate(360deg);}
+  }
+</style>
+</head>
+<body>
+
+<div class="chat-container">
+  <div class="chat-header">Event Rules Q&A</div>
+  <div id="chat"></div>
+  <div class="chat-input">
+    <input type="text" id="userQuestion" placeholder="Ask a question...">
+    <button onclick="submitQuestion()">Send</button>
+  </div>
+</div>
+
+<script src="https://js.puter.com/v2/"></script>
+<script>
+const eventRules = `
+Sunil Pradhan is a passionate and dedicated student and developer with strong skills in web and mobile development. He has completed learning HTML, CSS, JavaScript, Node.js, Express.js, and is about 80% proficient in React Native. Sunil is also skilled in Python, along with libraries like Pandas and NumPy, and is exploring AI tools and libraries such as scikit-learn and TensorFlow to expand his knowledge in artificial intelligence. Currently, he is actively working on various projects, including mobile apps, and is interested in creating intelligent solutions like chatbots that can answer common questions automatically and learn from human interactions. Sunil is curious, motivated, and always eager to enhance his skills, especially in front-end development, full-stack development, and AI integration.
+`;
+
+const chatDiv = document.getElementById("chat");
+
+// Function to ask AI
+async function askQuestion(question) {
+  const lower = question.toLowerCase();
+
+  // const greetings = ["hi", "hello", "hey"];
+  // if (greetings.some(g => lower.includes(g))) {
+  //   return "Hi! I am here to give all answers about the event.";
+  // }
+
+  // const identityQuestions = ["who are you", "what is your name"];
+  // if (identityQuestions.some(q => lower.includes(q))) {
+  //   return "I am an AI assistant designed by Sunil and here to give answers about 'Ultimate Trivia Challenge'.";
+  // }
+
+  // // 3️⃣ Handle polite phrases
+  // const polite = ["thanks", "thank you", "very good", "good job", "well done"];
+  // if (polite.some(p => lower.includes(p))) {
+  //   return "You're welcome! 😊";
+  // }
+
+  // 4️⃣ Default: answer from paragraph
+  const prompt = `
+You are an AI assistant. Follow these rules:
+
+1. Only answer questions based on the following paragraph. Do NOT provide any information outside it.
+2. If the user asks a question that is not in the paragraph, respond with: "I don't know about this question. For answers, you can contact the Event Co-ordinators."
+3. If the user asks for your identity, respond with: "I am an AI assistant designed by Sunil and here to give answers about 'Ultimate Trivia Challenge'."
+4. If the user greets you like very good etc, respond with a friendly greeting.
+5. If the user says thanks or praises you, respond with perpore answers like "You're welcome!" or "Glad to help!" with a emoji.
+6. Keep answers concise and to the point and give 👉 at start point of each emoji.
+
+Paragraph:
+${eventRules}
+
+User Input: ${question}
+Answer:
+  `;
+  try {
+    const response = await puter.ai.chat(prompt, { model: 'gpt-5-nano' });
+    return response;
+  } catch (err) {
+    console.error(err);
+    return "Error: Could not get answer.";
+  }
+}
+
+// Function to submit user question
+async function submitQuestion() {
+  const questionInput = document.getElementById('userQuestion');
+  const question = questionInput.value.trim();
+  if (!question) return;
+
+  addMessage(question, 'user');
+
+  // Add loader
+  const loaderDiv = addMessage("", 'ai');
+  loaderDiv.innerHTML = `<span class="loader"></span> Thinking...`;
+
+  const answer = await askQuestion(question);
+
+  loaderDiv.innerText = answer;
+
+  questionInput.value = "";
+  chatDiv.scrollTop = chatDiv.scrollHeight;
+}
+
+// Function to add message
+function addMessage(text, type) {
+  const div = document.createElement('div');
+  div.className = `message ${type}`;
+  div.innerHTML = text;
+  chatDiv.appendChild(div);
+  chatDiv.scrollTop = chatDiv.scrollHeight;
+  return div;
+}
+</script>
+
+</body>
+</html>
