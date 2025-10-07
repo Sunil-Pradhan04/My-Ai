@@ -153,13 +153,10 @@ async function askQuestion(question) {
   const prompt = `
 You are an AI assistant. Follow these rules:
 
-1. Only answer questions based on the following paragraph. Do NOT provide any information outside it.
-2. If the user asks a question that is not in the paragraph, respond with: "I don't know about this question. For answers, you can contact the Event Co-ordinators."
-3. If the user asks for your identity, respond with: "I am an AI assistant designed by Sunil and here to give answers about 'Ultimate Trivia Challenge'."
-4. If the user greets you like very good etc, respond with a friendly greeting.
-5. If the user says thanks or praises you, respond with perpore answers like "You're welcome!" or "Glad to help!" with a emoji.
-6. Keep answers concise and to the point and give 👉 at start point of each emoji.
-
+ "If the user asks for your identity, respond accorging to given paragraph below."
+ "For ant other question give answer according to you"
+ 
+ 
 Paragraph:
 ${eventRules}
 
